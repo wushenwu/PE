@@ -1,0 +1,39 @@
+# Microsoft Developer Studio Generated Dependency File, included by PEInfo.mak
+
+.\MainFrm.cpp : \
+	".\MainFrm.h"\
+	".\PEInfo.h"\
+	".\StdAfx.h"\
+	
+
+.\PEInfo.cpp : \
+	".\MainFrm.h"\
+	".\PEInfo.h"\
+	".\PEInfoDoc.h"\
+	".\PEInfoView.h"\
+	".\StdAfx.h"\
+	
+
+.\PEInfo.rc : \
+	".\res\PEInfo.ico"\
+	".\res\PEInfo.rc2"\
+	".\res\PEInfoDoc.ico"\
+	".\res\Toolbar.bmp"\
+	
+
+.\PEInfoDoc.cpp : \
+	".\PEInfo.h"\
+	".\PEInfoDoc.h"\
+	".\StdAfx.h"\
+	
+
+.\PEInfoView.cpp : \
+	".\PEInfo.h"\
+	".\PEInfoDoc.h"\
+	".\PEInfoView.h"\
+	".\StdAfx.h"\
+	
+
+.\StdAfx.cpp : \
+	".\StdAfx.h"\
+	
