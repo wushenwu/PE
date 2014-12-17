@@ -1,0 +1,105 @@
+Microsoft (R) COFF Binary File Dumper Version 6.00.8168
+Copyright (C) Microsoft Corp 1992-1998. All rights reserved.
+
+
+Dump of file 584.exe
+
+PE signature found
+
+File Type: EXECUTABLE IMAGE
+
+FILE HEADER VALUES
+             14C machine (i386)
+               1 number of sections
+        5483E0C6 time date stamp Sun Dec 07 13:08:22 2014
+               0 file pointer to symbol table
+               0 number of symbols
+              E0 size of optional header
+             10F characteristics
+                   Relocations stripped
+                   Executable
+                   Line numbers stripped
+                   Symbols stripped
+                   32 bit word machine
+
+OPTIONAL HEADER VALUES
+             10B magic #
+            5.12 linker version
+               0 size of code
+              68 size of initialized data
+               0 size of uninitialized data
+             1E8 RVA of entry point
+             1E0 base of code
+             1E0 base of data
+          400000 image base
+               4 section alignment
+               4 file alignment
+            4.00 operating system version
+            0.00 image version
+            4.00 subsystem version
+               0 Win32 version
+             248 size of image
+             1E0 size of headers
+            B223 checksum
+               2 subsystem (Windows GUI)
+               0 DLL characteristics
+          100000 size of stack reserve
+            1000 size of stack commit
+          100000 size of heap reserve
+            1000 size of heap commit
+               0 loader flags
+              10 number of directories
+               0 [       0] RVA [size] of Export Directory
+             1FC [      28] RVA [size] of Import Directory
+               0 [       0] RVA [size] of Resource Directory
+               0 [       0] RVA [size] of Exception Directory
+               0 [       0] RVA [size] of Certificates Directory
+               0 [       0] RVA [size] of Base Relocation Directory
+               0 [       0] RVA [size] of Debug Directory
+               0 [       0] RVA [size] of Architecture Directory
+               0 [       0] RVA [size] of Special Directory
+               0 [       0] RVA [size] of Thread Storage Directory
+               0 [       0] RVA [size] of Load Configuration Directory
+               0 [       0] RVA [size] of Bound Import Directory
+             1E0 [       8] RVA [size] of Import Address Table Directory
+               0 [       0] RVA [size] of Delay Import Directory
+               0 [       0] RVA [size] of Reserved Directory
+               0 [       0] RVA [size] of Reserved Directory
+
+
+SECTION HEADER #1
+   .data name
+      66 virtual size
+     1E0 virtual address
+      68 size of raw data
+     1E0 file pointer to raw data
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+C0000040 flags
+         Initialized Data
+         Read Write
+
+RAW DATA #1
+  004001E0: 2C 02 00 00 00 00 00 00 6A 00 6A 00 6A 00 6A 00  ,.......j.j.j.j.
+  004001F0: E8 01 00 00 00 C3 FF 25 E0 01 40 00 24 02 00 00  .......%..@.$...
+  00400200: 00 00 00 00 00 00 00 00 3A 02 00 00 E0 01 00 00  ........:.......
+  00400210: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  00400220: 00 00 00 00 2C 02 00 00 00 00 00 00 BE 01 4D 65  ....,.........Me
+  00400230: 73 73 61 67 65 42 6F 78 41 00 55 53 45 52 33 32  ssageBoxA.USER32
+  00400240: 2E 64 6C 6C 00 00                                .dll..
+
+  Section contains the following imports:
+
+    USER32.dll
+                4001E0 Import Address Table
+                400224 Import Name Table
+                     0 time date stamp
+                     0 Index of first forwarder reference
+
+                 1BE  MessageBoxA
+
+  Summary
+
+          68 .data
