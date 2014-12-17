@@ -1,9 +1,41 @@
 # Microsoft Developer Studio Generated Dependency File, included by PEInfo.mak
 
-.\MainFrm.cpp : \
-	".\MainFrm.h"\
+.\ConvertDlg.cpp : \
+	".\ConvertDlg.h"\
+	".\PE.H"\
 	".\PEInfo.h"\
-	".\StdAfx.h"\
+	
+
+.\DumpDlg.cpp : \
+	".\DumpDlg.h"\
+	".\LogView.h"\
+	".\PE.H"\
+	".\PEInfo.h"\
+	
+
+.\InfoEdit.cpp : \
+	".\InfoEdit.h"\
+	
+
+.\LogView.cpp : \
+	".\LogView.h"\
+	".\PE.H"\
+	
+
+.\MainFrm.cpp : \
+	".\ConvertDlg.h"\
+	".\DumpDlg.h"\
+	".\InfoEdit.h"\
+	".\LogView.h"\
+	".\MainFrm.h"\
+	".\PE.H"\
+	".\PEInfo.h"\
+	".\TblInfoView.h"\
+	".\TblTreeView.h"\
+	
+
+.\PE.CPP : \
+	".\PE.H"\
 	
 
 .\PEInfo.cpp : \
@@ -11,7 +43,6 @@
 	".\PEInfo.h"\
 	".\PEInfoDoc.h"\
 	".\PEInfoView.h"\
-	".\StdAfx.h"\
 	
 
 .\PEInfo.rc : \
@@ -24,16 +55,30 @@
 .\PEInfoDoc.cpp : \
 	".\PEInfo.h"\
 	".\PEInfoDoc.h"\
-	".\StdAfx.h"\
 	
 
 .\PEInfoView.cpp : \
 	".\PEInfo.h"\
 	".\PEInfoDoc.h"\
 	".\PEInfoView.h"\
-	".\StdAfx.h"\
 	
 
 .\StdAfx.cpp : \
+	"..\..\..\..\..\program\vc98\include\basetsd.h"\
 	".\StdAfx.h"\
+	
+
+.\TblInfoView.cpp : \
+	".\InfoEdit.h"\
+	".\MainFrm.h"\
+	".\PE.H"\
+	".\TblInfoView.h"\
+	
+
+.\TblTreeView.cpp : \
+	".\InfoEdit.h"\
+	".\LogView.h"\
+	".\MainFrm.h"\
+	".\TblInfoView.h"\
+	".\TblTreeView.h"\
 	

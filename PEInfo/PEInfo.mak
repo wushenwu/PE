@@ -72,6 +72,7 @@ LINK32=link.exe
 LINK32_FLAGS=/nologo /subsystem:windows /incremental:no /pdb:"$(OUTDIR)\PEInfo.pdb" /machine:I386 /out:"$(OUTDIR)\PEInfo.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\ConvertDlg.obj" \
+	"$(INTDIR)\DumpDlg.obj" \
 	"$(INTDIR)\InfoEdit.obj" \
 	"$(INTDIR)\LogView.obj" \
 	"$(INTDIR)\MainFrm.obj" \
@@ -82,8 +83,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\StdAfx.obj" \
 	"$(INTDIR)\TblInfoView.obj" \
 	"$(INTDIR)\TblTreeView.obj" \
-	"$(INTDIR)\PEInfo.res" \
-	"$(INTDIR)\DumpDlg.obj"
+	"$(INTDIR)\PEInfo.res"
 
 "$(OUTDIR)\PEInfo.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -145,6 +145,7 @@ BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\PEInfo.bsc" 
 BSC32_SBRS= \
 	"$(INTDIR)\ConvertDlg.sbr" \
+	"$(INTDIR)\DumpDlg.sbr" \
 	"$(INTDIR)\InfoEdit.sbr" \
 	"$(INTDIR)\LogView.sbr" \
 	"$(INTDIR)\MainFrm.sbr" \
@@ -154,8 +155,7 @@ BSC32_SBRS= \
 	"$(INTDIR)\PEInfoView.sbr" \
 	"$(INTDIR)\StdAfx.sbr" \
 	"$(INTDIR)\TblInfoView.sbr" \
-	"$(INTDIR)\TblTreeView.sbr" \
-	"$(INTDIR)\DumpDlg.sbr"
+	"$(INTDIR)\TblTreeView.sbr"
 
 "$(OUTDIR)\PEInfo.bsc" : "$(OUTDIR)" $(BSC32_SBRS)
     $(BSC32) @<<
@@ -166,6 +166,7 @@ LINK32=link.exe
 LINK32_FLAGS=/nologo /subsystem:windows /incremental:yes /pdb:"$(OUTDIR)\PEInfo.pdb" /debug /machine:I386 /out:"$(OUTDIR)\PEInfo.exe" /pdbtype:sept 
 LINK32_OBJS= \
 	"$(INTDIR)\ConvertDlg.obj" \
+	"$(INTDIR)\DumpDlg.obj" \
 	"$(INTDIR)\InfoEdit.obj" \
 	"$(INTDIR)\LogView.obj" \
 	"$(INTDIR)\MainFrm.obj" \
@@ -176,8 +177,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\StdAfx.obj" \
 	"$(INTDIR)\TblInfoView.obj" \
 	"$(INTDIR)\TblTreeView.obj" \
-	"$(INTDIR)\PEInfo.res" \
-	"$(INTDIR)\DumpDlg.obj"
+	"$(INTDIR)\PEInfo.res"
 
 "$(OUTDIR)\PEInfo.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<

@@ -98,15 +98,20 @@ void CTblInfoView::OnInitialUpdate()
 /************************************************************************/
 void CTblInfoView::UpdateListInfo(CString strTblName)
 {
-    //It's LogView's duty to show Import Info, Free Space Info, Export Info, BASE Relocation Info
+    //It's LogView's duty to show Import Info, Free Space Info, 
+    //              Export Info, BASE Relocation Info, TLS INFO, RES INFO
     extern const char *g_pszIMPORT;
     extern const char *g_pszFreeSpace;
     extern const char *g_pszEXPORT;
     extern const char *g_pszBASERELC;
+    extern const char *g_pszTLSINFO;
+    extern const char *g_pszRESINFO;
     if (0 == strTblName.Compare(g_pszIMPORT)
         ||0 == strTblName.Compare(g_pszFreeSpace)
         ||0 == strTblName.Compare(g_pszEXPORT)
-        ||0 == strTblName.Compare(g_pszBASERELC))
+        ||0 == strTblName.Compare(g_pszBASERELC)
+        ||0 == strTblName.Compare(g_pszTLSINFO)
+        ||0 == strTblName.Compare(g_pszRESINFO))
     {
         return;
     }

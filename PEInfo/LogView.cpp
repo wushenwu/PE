@@ -66,15 +66,19 @@ Function : Show Info, according to different operations                         
 /************************************************************************/
 void CLogView::UpdateInfo(CString strTblName)
 {
-    //we only deal with IMPORT, FreeSpace, EXPORT, BASERELC
+    //we only deal with IMPORT, FreeSpace, EXPORT, BASERELC, TLS, RES
     extern const char *g_pszIMPORT;
     extern const char *g_pszFreeSpace;
     extern const char *g_pszEXPORT;
     extern const char *g_pszBASERELC;
+    extern const char *g_pszTLSINFO;
+    extern const char *g_pszRESINFO;
     if (strTblName.Compare(g_pszIMPORT)
         && strTblName.Compare(g_pszFreeSpace)
         && strTblName.Compare(g_pszEXPORT)
-        && strTblName.Compare(g_pszBASERELC))
+        && strTblName.Compare(g_pszBASERELC)
+        && strTblName.Compare(g_pszTLSINFO)
+        && strTblName.Compare(g_pszRESINFO))
     {
         return;
     }  
@@ -97,6 +101,14 @@ void CLogView::UpdateInfo(CString strTblName)
     else if (0 == strTblName.Compare(g_pszBASERELC))
     {
         bRet = GetBaseRelocInfo(&pszLog, NULL, NULL);
+    }
+    else if (0 == strTblName.Compare(g_pszTLSINFO))
+    {
+        bRet = GetTLSInfo(&pszLog);
+    }
+    else if (0 == strTblName.Compare(g_pszRESINFO))
+    {
+        bRet = GetRESInfo(&pszLog);
     }
     else
     {

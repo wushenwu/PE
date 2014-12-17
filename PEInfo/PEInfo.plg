@@ -6,13 +6,13 @@
 --------------------Configuration: PEInfo - Win32 Debug--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP967.tmp" with contents
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP61B.tmp" with contents
 [
 /nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /FR"Debug/" /Fp"Debug/PEInfo.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
 "E:\Programming\Git\Ph3\PE\PEInfo\PE.CPP"
 ]
-Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP967.tmp" 
-Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP968.tmp" with contents
+Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP61B.tmp" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP61C.tmp" with contents
 [
 /nologo /subsystem:windows /incremental:yes /pdb:"Debug/PEInfo.pdb" /debug /machine:I386 /out:"Debug/PEInfo.exe" /pdbtype:sept 
 .\Debug\ConvertDlg.obj
@@ -29,12 +29,12 @@ Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP968.tmp" with con
 .\Debug\TblTreeView.obj
 .\Debug\PEInfo.res
 ]
-Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP968.tmp"
+Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP61C.tmp"
 <h3>Output Window</h3>
 Compiling...
 PE.CPP
 Linking...
-Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP969.tmp" with contents
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP61D.tmp" with contents
 [
 /nologo /o"Debug/PEInfo.bsc" 
 .\Debug\StdAfx.sbr
@@ -49,7 +49,7 @@ Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP969.tmp" with con
 .\Debug\PEInfoView.sbr
 .\Debug\TblInfoView.sbr
 .\Debug\TblTreeView.sbr]
-Creating command line "bscmake.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP969.tmp"
+Creating command line "bscmake.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP61D.tmp"
 Creating browse info file...
 <h3>Output Window</h3>
 

@@ -21,6 +21,8 @@ using namespace std;
 #define FREESPACE   "    Free Space"
 #define EXPORTDIR   "    Export Directory"
 #define BASERELC    "    Base Relocation"
+#define TLSINFO     "    TLS Info"
+#define RESINFO     "    Resource"
 
 //define the Header info you want to display in the list view
 #define HDRINFO_DOSHEADER   "Member|Offset|Size|Value"
@@ -93,7 +95,9 @@ static const char *gs_PETree = DOSHEADER"|"
                                IMPORTDIR"|"
                                FREESPACE"|"
                                EXPORTDIR"|"
-                               BASERELC;
+                               BASERELC"|"
+                               TLSINFO"|"
+                               RESINFO;
 
 static const char *gs_pszSize[] = {"NULL", "Byte", "Word", "NULL", "DWord"};
 static const char *gs_pszDataDir[] = {
@@ -136,6 +140,8 @@ const char *g_pszIMPORT = IMPORTDIR;
 const char *g_pszFreeSpace = FREESPACE;
 const char *g_pszEXPORT = EXPORTDIR;
 const char *g_pszBASERELC = BASERELC;
+const char *g_pszTLSINFO  = TLSINFO;
+const char *g_pszRESINFO  = RESINFO;
 
 //define the map between directory and header
 //Do not forget to add in the InitMapInfo
@@ -2266,4 +2272,399 @@ HMODULE LoadDll()
         call dwOEP
     }
     return (HMODULE)lpAddr;
+}
+
+/************************************************************************/
+/* 
+Function : Entry for retrieving TLS Info
+Params   : ppszBuf used to receive the log                             */
+/************************************************************************/
+BOOL GetTLSInfo(char **ppszBuf)
+{   
+    ASSERT(ppszBuf != NULL);
+    *ppszBuf = NULL;
+
+    if (gs_pOPTHDR->NumberOfRvaAndSizes < IMAGE_DIRECTORY_ENTRY_TLS + 1)
+    {
+        return FALSE;
+    }
+
+    PIMAGE_DATA_DIRECTORY pDataDir = (PIMAGE_DATA_DIRECTORY)&gs_pOPTHDR->DataDirectory[IMAGE_DIRECTORY_ENTRY_TLS];
+    if (NULL == pDataDir->VirtualAddress)
+    {
+        return FALSE;
+    }
+       
+    //1. Get TLS RVA and Size from DataDirectory
+    static tagAddrMAP *pAddrMap = new tagAddrMAP;
+    ASSERT(pAddrMap != NULL);
+    pAddrMap->m_AddrType = tagAddrMAP.enu_AddrType::RVA;
+    
+    pAddrMap->m_dwRVA = pDataDir->VirtualAddress;
+    GetAddrMAPByRVA(pAddrMap);
+    DWORD dwTLSRVA = pAddrMap->m_dwRVA;
+    DWORD dwTLSFA  = pAddrMap->m_dwFA;    
+    wsprintf(gs_pszBuf, "TLS Directory: -------------------------------\r\n"
+                        "RVA\t:%p\r\nFA\t:%p\r\n"
+                        "Size\t:%p\r\n"
+                        "Section\t:%s\r\n\r\n", 
+                        dwTLSRVA,
+                        dwTLSFA,
+                        pDataDir->Size,
+                        pAddrMap->m_szSectionName);
+
+    //2. Get IMAGE_TLS_DIRECTORY info
+    /*
+    typedef struct _IMAGE_TLS_DIRECTORY32 {
+        DWORD   StartAddressOfRawData;
+        DWORD   EndAddressOfRawData;
+        PDWORD  AddressOfIndex;
+        PIMAGE_TLS_CALLBACK *AddressOfCallBacks;
+        DWORD   SizeOfZeroFill;
+        DWORD   Characteristics;
+    } IMAGE_TLS_DIRECTORY32;
+    typedef IMAGE_TLS_DIRECTORY32 * PIMAGE_TLS_DIRECTORY32;
+    */
+    PIMAGE_TLS_DIRECTORY pTLSDir = (PIMAGE_TLS_DIRECTORY)
+                                ((unsigned char *)gs_pDOSHDR + dwTLSFA);
+
+    DWORD dwFA[4] = {0};
+    pAddrMap->m_AddrType = tagAddrMAP.enu_AddrType::VA;
+
+    //get FA for these addr
+    pAddrMap->m_dwVA = pTLSDir->StartAddressOfRawData;
+    GetAddrMAP(pAddrMap);
+    dwFA[0] = pAddrMap->m_dwFA;
+    pAddrMap->m_dwVA = pTLSDir->EndAddressOfRawData;
+    GetAddrMAP(pAddrMap);
+    dwFA[1] = pAddrMap->m_dwFA;
+    pAddrMap->m_dwVA = (DWORD)pTLSDir->AddressOfIndex;
+    GetAddrMAP(pAddrMap);
+    dwFA[2] = pAddrMap->m_dwFA;
+    pAddrMap->m_dwVA = (DWORD)pTLSDir->AddressOfCallBacks;
+    GetAddrMAP(pAddrMap);
+    dwFA[3] = pAddrMap->m_dwFA;
+
+
+    //info in IMAGE_TLS_DIRECTORY are absolute, VA
+    //这些可用FIELDINFO宏进行获取
+    _snprintf(gs_pszBuf, MAXBUF, "%sStarAddrOfRawData:  %p(VA)  %p(FA)\r\n"
+                                 "EndAddrOfRawData:     %p      %p\r\n"
+                                 "AddressOfIndex:       %p      %p\r\n"
+                                 "AddressOfCallBacks:   %p      %p\r\n"
+                                 "SizeOfZeroFill:       %p\r\n"
+                                 "Characteristics:      %p\r\n\r\n",
+                                 gs_pszBuf,
+                                 pTLSDir->StartAddressOfRawData, dwFA[0],
+                                 pTLSDir->EndAddressOfRawData,   dwFA[1],
+                                 pTLSDir->AddressOfIndex,        dwFA[2],
+                                 pTLSDir->AddressOfCallBacks,    dwFA[3],
+                                 pTLSDir->SizeOfZeroFill,
+                                 pTLSDir->Characteristics);
+
+    _snprintf(gs_pszBuf, MAXBUF, "%sCallBacks:\r\n", gs_pszBuf);
+
+    DWORD *pCallBacks = (DWORD *)((unsigned char *)gs_pDOSHDR + dwFA[3]);
+    int i = 0;
+    while (pCallBacks[i])
+    {
+        _snprintf(gs_pszBuf, MAXBUF, "%s%p\r\n", gs_pszBuf, pCallBacks[i]);
+        i++;
+    }
+
+
+    *ppszBuf = gs_pszBuf;
+    return TRUE;
+}
+
+/************************************************************************/
+/*
+Function: Encapsulation of converting WideChar to MultiByte
+Param   : lpcwszStr is the source of wide char you want to covert
+          lpszStr is the dst for multibytes
+          dwSize is the length of the buffer you provide   
+Return  : TRUE if dwSize is enough 
+          FALSE otherwise
+                                                                  */
+/************************************************************************/
+static BOOL Wide2Multi(LPCWSTR lpcwszStr, LPSTR lpszStr, DWORD dwSize)
+{	
+	DWORD dwMinSize;
+	dwMinSize = WideCharToMultiByte(CP_OEMCP,
+                                    NULL,
+                                    lpcwszStr,
+                                    -1,         //设为-1,可获得所需宽字符数组空间的大小
+                                    NULL,
+                                    0,
+                                    NULL,
+                                    FALSE
+                                    ); 
+	if(dwSize < dwMinSize)
+	{
+		return FALSE;
+	}
+
+	WideCharToMultiByte(CP_OEMCP,
+                        NULL,
+                        lpcwszStr,
+                        -1,
+                        lpszStr,
+                        dwSize,
+                        NULL,
+                        FALSE
+                        );
+
+	return TRUE;
+}
+
+/************************************************************************/
+/* 
+Function : loop every resource directories  
+Params   : pRESDir points the current resource directory
+           dwRESFA indicate where the resource starts 
+           pszSplit used to format level*/
+/************************************************************************/
+void LoopRes(PIMAGE_RESOURCE_DIRECTORY pRESDir, DWORD dwRESFA, const char *pszSplit)
+{
+    //now loop every entries
+    /*
+    //
+    // Each directory contains the 32-bit Name of the entry and an offset,
+    // relative to the beginning of the resource directory of the data associated
+    // with this directory entry.  
+    
+    // If the name of the entry is an actual text
+    // string instead of an integer Id, then the high order bit of the name field
+    // is set to one and the low order 31-bits are an offset, relative to the
+    // beginning of the resource directory of the string, which is of type
+    // IMAGE_RESOURCE_DIRECTORY_STRING.  Otherwise the high bit is clear and the
+    // low-order 16-bits are the integer Id that identify this resource directory
+    // entry. 
+
+    //If the directory entry is yet another resource directory (i.e. a
+    // subdirectory), then the high order bit of the offset field will be
+    // set to indicate this.  Otherwise the high bit is clear and the offset
+    // field points to a resource data entry.
+    //
+
+    typedef struct _IMAGE_RESOURCE_DIRECTORY_ENTRY {
+        union {
+            struct {
+                DWORD NameOffset:31;
+                DWORD NameIsString:1;
+            };
+            DWORD   Name;
+            WORD    Id;
+        };
+        union {
+            DWORD   OffsetToData;
+            struct {
+                DWORD   OffsetToDirectory:31;
+                DWORD   DataIsDirectory:1;
+            };
+        };
+    } IMAGE_RESOURCE_DIRECTORY_ENTRY, *PIMAGE_RESOURCE_DIRECTORY_ENTRY;
+    */
+
+    //The first count is the number of entries at
+    // beginning of the array that have actual names associated with each entry.
+    // The entries are in ascending order, case insensitive strings.  
+    // The second count is the number of entries that immediately follow the named entries.
+    // This second count identifies the number of entries that have 16-bit integer
+    // Ids as their name.  These entries are also sorted in ascending order.
+
+    PIMAGE_RESOURCE_DIRECTORY_ENTRY pRESDirEntry = (PIMAGE_RESOURCE_DIRECTORY_ENTRY)((unsigned char *)pRESDir + sizeof(IMAGE_RESOURCE_DIRECTORY));
+    PIMAGE_RESOURCE_DIRECTORY pRESDirSub = NULL;
+    PIMAGE_RESOURCE_DIR_STRING_U pRESStr = NULL;
+    PIMAGE_RESOURCE_DATA_ENTRY pRESDataEntry = NULL;
+
+    static tagAddrMAP *pAddrMap = new tagAddrMAP;
+    ASSERT(pAddrMap != NULL);
+    pAddrMap->m_AddrType = tagAddrMAP.enu_AddrType::RVA;
+
+    DWORD dwOffSetToData = 0;
+    WCHAR *pwName = NULL;
+    size_t nLen = 0;
+    char szName[MAXBYTE] = {NULL};
+    char szSplit[MAXBYTE] = {NULL};
+    strcpy(szSplit, pszSplit);
+    strcat(szSplit, "\t");
+
+    WORD wDirs = pRESDir->NumberOfNamedEntries + pRESDir->NumberOfIdEntries;
+    WORD wIndex = 0;
+    for ( ; wIndex < wDirs; wIndex++)
+    {
+        // If the name of the entry is an actual text
+        // string instead of an integer Id, then the high order bit of the name field
+        // is set to one and the low order 31-bits are an offset, relative to the
+        // beginning of the resource directory of the string, which is of type
+        // IMAGE_RESOURCE_DIRECTORY_STRING. 
+        
+        if (pRESDirEntry[wIndex].NameIsString == 1)
+        {
+            //NameIsString = 1 NameOffset  Name
+            dwOffSetToData = pRESDirEntry[wIndex].OffsetToData;
+            pRESStr = (PIMAGE_RESOURCE_DIR_STRING_U)((unsigned char *)gs_pDOSHDR + dwRESFA + (pRESDirEntry[wIndex].Name & 0x7FFFFFFF));  
+
+            strcpy(szName, "Error!");
+            nLen = pRESStr->Length * sizeof(WCHAR); 
+            pwName = new WCHAR[nLen];
+            if (pwName != NULL)
+            {
+                memcpy(pwName, pRESStr->NameString, nLen);
+                pwName[pRESStr->Length] = 0;
+                Wide2Multi(pwName, szName, MAXBYTE);
+                delete[] pwName;
+                pwName = NULL;
+            }
+            
+            _snprintf(gs_pszBuf, MAXBUF, "%s%sResource Directory Entry %04x, Name: %s, OffSetToData: %p(%p)\r\n",
+                                        gs_pszBuf,
+                                        pszSplit,
+                                        wIndex,
+                                        szName,
+                                        dwOffSetToData,
+                                        dwRESFA + (dwOffSetToData & 0x7FFFFFFF));
+        }//end for IsName
+        else
+        {
+            //NameIsString = 0 Id
+            ASSERT(pRESDirEntry[wIndex].NameIsString == 0);
+            dwOffSetToData = pRESDirEntry[wIndex].OffsetToData;
+            _snprintf(gs_pszBuf, MAXBUF, "%s%sResource Directory Entry %04x, ID: %04X, OffSetToData: %p(%p)\r\n",
+                                        gs_pszBuf,
+                                        pszSplit,
+                                        wIndex,
+                                        pRESDirEntry[wIndex].Id,
+                                        dwOffSetToData,
+                                        dwRESFA + (dwOffSetToData & 0x7FFFFFFF));
+        }//end for Id
+
+        //offset
+        //If the directory entry is yet another resource directory (i.e. a
+        // subdirectory), then the high order bit of the offset field will be
+        // set to indicate this.  Otherwise the high bit is clear and the offset
+        // field points to a resource data entry.
+        //
+        if (pRESDirEntry[wIndex].DataIsDirectory)
+        {
+            pRESDirSub = (PIMAGE_RESOURCE_DIRECTORY)((unsigned char *)gs_pDOSHDR + dwRESFA + (dwOffSetToData & 0x7FFFFFFF));  
+            LoopRes(pRESDirSub, dwRESFA, szSplit);
+        }
+        else
+        {
+            //now as Data Entry
+            /*typedef struct _IMAGE_RESOURCE_DATA_ENTRY {
+                DWORD   OffsetToData;
+                DWORD   Size;
+                DWORD   CodePage;
+                DWORD   Reserved;
+            } IMAGE_RESOURCE_DATA_ENTRY, *PIMAGE_RESOURCE_DATA_ENTRY;
+
+            //It contains an offset, relative to the beginning of the resource
+            // directory of the data for the resource
+            */
+            pRESDataEntry = (PIMAGE_RESOURCE_DATA_ENTRY)((unsigned char *)gs_pDOSHDR + dwRESFA + dwOffSetToData);
+
+            pAddrMap->m_dwRVA = pRESDataEntry->OffsetToData;
+            GetAddrMAPByRVA(pAddrMap);
+            _snprintf(gs_pszBuf, MAXBUF, "%s%sOffsetToData: %p(%p), Size: %p, CodePage: %p\r\n\r\n",
+                                 gs_pszBuf, 
+                                 szSplit,
+                                 pRESDataEntry->OffsetToData,
+                                 pAddrMap->m_dwFA,
+                                 pRESDataEntry->Size,
+                                 pRESDataEntry->CodePage
+                                 );
+
+        }      
+    }  
+}
+
+/************************************************************************/
+/* 
+Function : Entry for Retrieving RES INFO
+Params   : ppszBuf used to receive the log info                        */
+/************************************************************************/
+BOOL GetRESInfo(char **ppszBuf)
+{
+    ASSERT(ppszBuf != NULL);
+    *ppszBuf = NULL;
+
+    if (gs_pOPTHDR->NumberOfRvaAndSizes < IMAGE_DIRECTORY_ENTRY_RESOURCE + 1)
+    {
+        return FALSE;
+    }
+
+    PIMAGE_DATA_DIRECTORY pDataDir = (PIMAGE_DATA_DIRECTORY)&gs_pOPTHDR->DataDirectory[IMAGE_DIRECTORY_ENTRY_RESOURCE];
+    if (NULL == pDataDir->VirtualAddress)
+    {
+        return FALSE;
+    }
+       
+    //1. Get RES RVA and Size from DataDirectory
+    static tagAddrMAP *pAddrMap = new tagAddrMAP;
+    ASSERT(pAddrMap != NULL);
+    pAddrMap->m_AddrType = tagAddrMAP.enu_AddrType::RVA;
+    
+    pAddrMap->m_dwRVA = pDataDir->VirtualAddress;
+    GetAddrMAPByRVA(pAddrMap);
+    DWORD dwRESRVA = pAddrMap->m_dwRVA;
+    DWORD dwRESFA  = pAddrMap->m_dwFA;    
+    wsprintf(gs_pszBuf, "RES Directory: -------------------------------\r\n"
+                        "RVA\t:%p\r\nFA\t:%p\r\n"
+                        "Size\t:%p\r\n"
+                        "Section\t:%s\r\n\r\n", 
+                        dwRESRVA,
+                        dwRESFA,
+                        pDataDir->Size,
+                        pAddrMap->m_szSectionName);
+
+    //2. Get IMAGE_RESOURCE info
+    /*
+    //
+    // Resource directory consists of two counts, following by a variable length
+    // array of directory entries. 
+    //The first count is the number of entries at
+    // beginning of the array that have actual names associated with each entry.
+    // The entries are in ascending order, case insensitive strings.  
+    // The second count is the number of entries that immediately follow the named entries.
+    // This second count identifies the number of entries that have 16-bit integer
+    // Ids as their name.  These entries are also sorted in ascending order.
+    //
+    // This structure allows fast lookup by either name or number, but for any
+    // given resource entry only one form of lookup is supported, not both.
+    // This is consistant with the syntax of the .RC file and the .RES file.
+
+    typedef struct _IMAGE_RESOURCE_DIRECTORY {
+        DWORD   Characteristics;
+        DWORD   TimeDateStamp;
+        WORD    MajorVersion;
+        WORD    MinorVersion;
+        WORD    NumberOfNamedEntries;
+        WORD    NumberOfIdEntries;
+        //  IMAGE_RESOURCE_DIRECTORY_ENTRY DirectoryEntries[];
+    } IMAGE_RESOURCE_DIRECTORY, *PIMAGE_RESOURCE_DIRECTORY;
+    */
+    PIMAGE_RESOURCE_DIRECTORY pRESDir = (PIMAGE_RESOURCE_DIRECTORY)
+                                ((unsigned char *)gs_pDOSHDR + dwRESFA);
+
+    _snprintf(gs_pszBuf, MAXBUF, "%sCharacteristics:  %p\r\n"
+                                 "TimeDateStamp:     %p\r\n"
+                                 "MajorVersion:      %04X\r\n"
+                                 "MinorVersion:      %04X\r\n"
+                                 "NumberOfNamedEntries:  %04X\r\n"
+                                 "NumberOfIdEntries:     %04x\r\n\r\n",
+                                 gs_pszBuf,
+                                 pRESDir->Characteristics,
+                                 pRESDir->TimeDateStamp,
+                                 pRESDir->MajorVersion,
+                                 pRESDir->MinorVersion,
+                                 pRESDir->NumberOfNamedEntries,
+                                 pRESDir->NumberOfIdEntries);
+
+    LoopRes(pRESDir, dwRESFA, "");
+
+    *ppszBuf = gs_pszBuf;
+    return TRUE;
 }

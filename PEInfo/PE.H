@@ -232,4 +232,18 @@ Return  : NULL for failure, otherwise the hModule                               
 /************************************************************************/
 HMODULE LoadDll();
 
+/************************************************************************/
+/* 
+Function : Entry for retrieving TLS Info
+Params   : ppszBuf used to receive the log                             */
+/************************************************************************/
+BOOL GetTLSInfo(char **ppszBuf);
+
+/************************************************************************/
+/* 
+Function : Entry for Retrieving RES INFO
+Params   : ppszBuf used to receive the log info                        */
+/************************************************************************/
+BOOL GetRESInfo(char **ppszBuf);
+
 #endif

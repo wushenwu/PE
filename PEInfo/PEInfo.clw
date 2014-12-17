@@ -15,11 +15,11 @@ Class3=CPEInfoView
 Class4=CMainFrame
 
 ResourceCount=4
-Resource1=IDD_ABOUTBOX
-Resource2=IDR_MAINFRAME
+Resource1=IDR_MAINFRAME
+Resource2=IDD_DLG_CONVERT
 Class5=CAboutDlg
 Class6=CConvertDlg
-Resource3=IDD_DLG_CONVERT
+Resource3=IDD_ABOUTBOX
 Class7=CDumpDlg
 Resource4=IDD_DLG_DUMP
 
